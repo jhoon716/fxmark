@@ -26,7 +26,7 @@ class Runner(object):
     # media path
     LOOPDEV = "/dev/loopX"
     NVMEDEV = "/dev/nvme0n1pX"
-    HDDDEV  = "/dev/sdX"
+    HDDDEV  = "/dev/vda2"
     SSDDEV  = "/dev/sdY"
 
     # test core granularity
