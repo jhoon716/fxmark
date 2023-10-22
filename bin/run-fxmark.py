@@ -144,6 +144,7 @@ class Runner(object):
         self.dev_null    = open("/dev/null", "a") if not self.DEBUG_OUT else None
         self.npcpu       = cpupol.PHYSICAL_CHIPS * cpupol.CORE_PER_CHIP
         self.nhwthr      = self.npcpu * cpupol.SMT_LEVEL
+        self.oversub     = oversub
         self.ncores      = self.get_ncores()
         self.test_root   = os.path.normpath(
             os.path.join(CUR_DIR, self.ROOT_NAME))
@@ -166,7 +167,6 @@ class Runner(object):
         self.log_path    = ""
         self.umount_hook = []
         self.active_ncore = -1
-        self.oversub = oversub
 
     def log_start(self):
         self.log_dir = os.path.normpath(
@@ -394,16 +394,15 @@ class Runner(object):
             for bench in self.BENCH_TYPES:
                 for media in self.MEDIA_TYPES:
                     for dio in self.DIRECTIOS:
-                        for osub in self.OVERSUBSC:
-                            for fs in self.FS_TYPES:
-                                if fs == "tmpfs" and media != "mem":
-                                    continue
-                                mount_fn = self.HOWTO_MOUNT.get(fs, None)
-                                if not mount_fn:
-                                    continue
-                                if self._match_config(self.FILTER, \
-                                                    (media, fs, bench, str(ncore), dio, osub)):
-                                    yield(media, fs, bench, ncore, dio, osub)
+                        for fs in self.FS_TYPES:
+                            if fs == "tmpfs" and media != "mem":
+                                continue
+                            mount_fn = self.HOWTO_MOUNT.get(fs, None)
+                            if not mount_fn:
+                                continue
+                            if self._match_config(self.FILTER, \
+                                                (media, fs, bench, str(ncore), dio)):
+                                yield(media, fs, bench, ncore, dio)
 
     def fxmark_env(self):
         env = ' '.join(["PERFMON_LEVEL=%s" % self.PERFMON_LEVEL,
@@ -460,7 +459,7 @@ class Runner(object):
         try:
             cnt = -1
             self.log_start()
-            for (cnt, (media, fs, bench, ncore, dio, osub)) in enumerate(self.gen_config()):
+            for (cnt, (media, fs, bench, ncore, dio)) in enumerate(self.gen_config()):
                 (ncore, nbg) = self.add_bg_worker_if_needed(bench, ncore)
                 nfg = ncore - nbg
 
@@ -474,7 +473,7 @@ class Runner(object):
                     continue
                 self.log("## %s:%s:%s:%s:%s" % (media, fs, bench, nfg, dio))
                 self.pre_work()
-                self.fxmark(media, fs, bench, ncore, nfg, nbg, dio, osub)
+                self.fxmark(media, fs, bench, ncore, nfg, nbg, dio)
                 self.post_work()
             self.log("### NUM_TEST_CONF  = %d" % (cnt + 1))
         finally:
