@@ -20,7 +20,7 @@ struct cmd_opt {
 	int nbg;
 	int duration;
 	int directio;
-	int osub;
+	int cpu_cnt;
 	char *root;
 	char *profile_start_cmd;
 	char *profile_stop_cmd;

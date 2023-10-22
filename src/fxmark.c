@@ -151,7 +151,7 @@ static int parse_option(int argc, char *argv[], struct cmd_opt *opt)
 #endif
 			break;
 		case 'o':
-			opt->osub = atoi(optarg);
+			opt->cpu_cnt = atoi(optarg);
 			break;
 		case 'r':
 			opt->root = optarg;
@@ -199,7 +199,7 @@ static void init_bench(struct bench *bench, struct cmd_opt *opt)
 
 	bench->duration = opt->duration;
 	bench->directio = opt->directio;
-	bench->osub = opt->osub;
+	bench->cpu_cnt = opt->cpu_cnt;
 	strncpy(bench->profile_start_cmd,
 		opt->profile_start_cmd, BENCH_PROFILE_CMD_BYTES);
 	strncpy(bench->profile_stop_cmd,
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* create, initialize, and run a bench */ 
-	bench = alloc_bench(opt.ncore, opt.nbg, opt.osub);
+	bench = alloc_bench(opt.ncore, opt.nbg, opt.cpu_cnt);
 	init_bench(bench, &opt);
 	run_bench(bench);
 	report_bench(bench, stdout);

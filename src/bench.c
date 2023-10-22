@@ -40,13 +40,12 @@ static int setaffinity(int c)
         return sched_setaffinity(0, sizeof(cpuset), &cpuset);
 }
 
-struct bench *alloc_bench(int ncpu, int nbg, int osub)
+struct bench *alloc_bench(int ncpu, int nbg, int cpu_cnt)
 {
         struct bench *bench; 
         struct worker *worker;
         void *shmem;
-        int n_workers = ncpu * (osub ? 2 : 1);
-        int shmem_size = sizeof(*bench) + sizeof(*worker) * n_workers;
+        int shmem_size = sizeof(*bench) + sizeof(*worker) * ncpu;
         int i;
         
         /* alloc shared memory using mmap */
@@ -60,13 +59,13 @@ struct bench *alloc_bench(int ncpu, int nbg, int osub)
         bench = (struct bench *)shmem;
         bench->ncpu = ncpu; 
         bench->nbg  = nbg;
-        bench->osub = osub;
+        bench->cpu_cnt = cpu_cnt;
         bench->workers = (struct worker*)(shmem + sizeof(*bench));
-        for (i = 0; i < n_workers; ++i) {
+        for (i = 0; i < ncpu; ++i) {
                 worker = &bench->workers[i];
                 worker->bench = bench;
                 worker->id = seq_cores[i];
-		worker->is_bg = i >= (n_workers - nbg);
+		worker->is_bg = i >= (ncpu - nbg);
         }
 
         return bench;
@@ -89,7 +88,7 @@ static void worker_main(void *arg)
         int err = 0;
 
         /* set affinity */ 
-        setaffinity(worker->id % bench->ncpu);
+        setaffinity(worker->id % bench->cpu_cnt);
 
         /* pre-work */
         if (bench->ops.pre_work) {
