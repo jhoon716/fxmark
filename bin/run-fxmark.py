@@ -211,11 +211,10 @@ class Runner(object):
         ncores = []
         test_hw_thr_cnts = hw_thr_cnts_map.get(self.CORE_GRAIN,
                                                cpupol.test_hw_thr_cnts_fine_grain)
-        # for n in test_hw_thr_cnts:
-        #     if n > self.npcpu:
-        #         break
-        #     ncores.append(n)
-        ncores.append(n)
+        for n in test_hw_thr_cnts:
+            # if n > self.npcpu:
+            #     break
+            ncores.append(n)
         return ncores
 
     def exec_cmd(self, cmd, out=None):
