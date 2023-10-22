@@ -438,7 +438,7 @@ class Runner(object):
                         "--nbg",  str(nbg),
                         "--duration", str(self.DURATION),
                         "--directio", directio,
-                        "--oversub", self.npcpu,
+                        "--oversub", str(self.npcpu),
                         "--root", self.test_root,
                         "--profbegin", "\"%s\"" % self.perfmon_start,
                         "--profend",   "\"%s\"" % self.perfmon_stop,
