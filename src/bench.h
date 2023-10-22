@@ -33,6 +33,7 @@ struct bench {
 	int nbg;
 	unsigned int duration;
 	int	directio;
+	int osub;
 	struct worker *workers; 
 	struct bench_operations ops;
 	char profile_start_cmd[BENCH_PROFILE_CMD_BYTES];
@@ -57,7 +58,7 @@ struct worker {
 	char *page;		/*private data buffer*/
 } CACHELINE_ALIGNED;
 
-struct bench *alloc_bench(int ncpu, int nbg);
+struct bench *alloc_bench(int ncpu, int nbg, int osub);
 void run_bench(struct bench *bench);
 void report_bench(struct bench *bench, FILE *out);
 

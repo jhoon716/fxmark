@@ -110,6 +110,7 @@ static int parse_option(int argc, char *argv[], struct cmd_opt *opt)
 		{"nbg",       required_argument, 0, 'g'}, 
 		{"duration",  required_argument, 0, 'd'}, 
 		{"directio",  required_argument, 0, 'D'}, 
+		{"oversub",   required_argument, 0, 'o'}, 
 		{"root",      required_argument, 0, 'r'}, 
 		{"profbegin", required_argument, 0, 'b'},
 		{"profend",   required_argument, 0, 'e'},
@@ -124,7 +125,7 @@ static int parse_option(int argc, char *argv[], struct cmd_opt *opt)
 	for(arg_cnt = 0; 1; ++arg_cnt) {
 		int c, idx = 0;
 		c = getopt_long(argc, argv, 
-				"t:n:g:d:D:r:b:e:l:", options, &idx);
+				"t:n:g:d:D:o:r:b:e:l:", options, &idx);
 		if (c == -1)
 			break; 
 		switch(c) {
@@ -148,6 +149,9 @@ static int parse_option(int argc, char *argv[], struct cmd_opt *opt)
 			if(opt->directio)
 				fprintf(stderr, "DirectIO Enabled\n");
 #endif
+			break;
+		case 'o':
+			opt->osub = atoi(optarg);
 			break;
 		case 'r':
 			opt->root = optarg;
@@ -182,6 +186,7 @@ static void usage(FILE *out)
 	fprintf(out, "  --duration  = duration in seconds\n");
 	fprintf(out, "  --directio  = file flag set O_DIRECT : 0-false, 1-true\n"
 		"                                         (only valid for DWxx type)\n");
+	fprintf(out, "  --oversub   = oversubscription\n");
 	fprintf(out, "  --root      = test root directory\n");
 	fprintf(out, "  --profbegin = profiling start command\n");
 	fprintf(out, "  --profend   = profiling stop command\n");
@@ -194,6 +199,7 @@ static void init_bench(struct bench *bench, struct cmd_opt *opt)
 
 	bench->duration = opt->duration;
 	bench->directio = opt->directio;
+	bench->osub = opt->osub;
 	strncpy(bench->profile_start_cmd,
 		opt->profile_start_cmd, BENCH_PROFILE_CMD_BYTES);
 	strncpy(bench->profile_stop_cmd,
@@ -216,7 +222,7 @@ int main(int argc, char *argv[])
 	}
 
 	/* create, initialize, and run a bench */ 
-	bench = alloc_bench(opt.ncore, opt.nbg);
+	bench = alloc_bench(opt.ncore, opt.nbg, opt.osub);
 	init_bench(bench, &opt);
 	run_bench(bench);
 	report_bench(bench, stdout);
