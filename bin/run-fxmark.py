@@ -45,8 +45,8 @@ class Runner(object):
         self.DEBUG_OUT     = False
 
         # bench config
-        self.DISK_SIZE     = "32G"
-        self.DURATION      = 30 # seconds
+        self.DISK_SIZE     = "10G"
+        self.DURATION      = 10 # seconds
         self.DIRECTIOS     = ["bufferedio", "directio"]  # enable directio except tmpfs -> nodirectio 
         self.OVERSUBSC     = ["0", "1"]
         self.MEDIA_TYPES   = ["ssd", "hdd", "nvme", "mem"]
